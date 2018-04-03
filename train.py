@@ -61,7 +61,7 @@ class Trainer:
             'TrainLogger.txt',
             self.save_results
         )
-        self.params_loss = ['Loss', 'Accuracy']
+        self.params_loss = ['Loss', 'Acc']
         self.log_loss.register(self.params_loss)
 
         # monitor training
@@ -94,12 +94,11 @@ class Trainer:
         elif self.log_type == 'progressbar':
             # progress bar message formatter
             self.print_formatter = '({}/{})' \
-                                   ' Load: {:.6f}s' \
-                                   ' | Process: {:.3f}s' \
-                                   ' | Total: {:}' \
+                                   ' | Proc: {:.3f}s' \
+                                   ' | Tot: {:}' \
                                    ' | ETA: {:}'
             for item in self.params_loss:
-                self.print_formatter += ' | ' + item + ' {:.4f}'
+                self.print_formatter += ' | ' + item + ' {:.3f}'
             self.print_formatter += ' | lr: {:.2e}'
 
         self.evalmodules = []
@@ -118,7 +117,7 @@ class Trainer:
         if self.log_type == 'progressbar':
             # Progress bar
             processed_data_len = 0
-            bar = plugins.Bar('{:<10}'.format('Train'), max=len(dataloader))
+            bar = plugins.Bar('{:<5}'.format('Train'), max=len(dataloader))
         end = time.time()
 
         for i, (inputs, labels) in enumerate(dataloader):
@@ -157,7 +156,7 @@ class Trainer:
                 processed_data_len += len(inputs)
 
                 bar.suffix = self.print_formatter.format(
-                    *[processed_data_len, len(dataloader.sampler), data_time,
+                    *[processed_data_len, len(dataloader.sampler),  # data_time,
                       batch_time, bar.elapsed_td, bar.eta_td] +
                      [self.losses[key] for key in self.params_monitor] +
                      [self.optimizer.param_groups[-1]['lr']]

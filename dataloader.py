@@ -83,6 +83,14 @@ class Dataloader:
                 ])
             )
 
+        elif self.dataset_train_name == 'UISDSC':
+            self.dataset_train = getattr(datasets, self.dataset_train_name)(
+                root=self.args.dataroot, train=True, download=True,
+                transform=transforms.Compose([
+                    transforms.Normalize((0.1307,), (0.3081,))
+                ])
+            )
+
         elif self.dataset_train_name == 'ImageNet':
             normalize = transforms.Normalize(
                 mean=[0.485, 0.456, 0.406],
@@ -206,6 +214,14 @@ class Dataloader:
                 root=self.args.dataroot, train=False, download=True,
                 transform=transforms.Compose([
                     transforms.ToTensor(),
+                    transforms.Normalize((0.1307,), (0.3081,))
+                ])
+            )
+
+        elif self.dataset_test_name == 'UISDSC':
+            self.dataset_test = getattr(datasets, self.dataset_test_name)(
+                root=self.args.dataroot, train=False, download=True,
+                transform=transforms.Compose([
                     transforms.Normalize((0.1307,), (0.3081,))
                 ])
             )

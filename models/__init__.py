@@ -7,3 +7,4 @@ from .resnet import *
 from .net import *
 from .preactresnet import *
 from .sphereface import *
+from .uids import *

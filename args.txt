@@ -3,29 +3,30 @@
 port = 8097
 env = main
 same_env = Yes
-log_type = traditional
-save_results = No
+log_type = progressbar
+save_results = Yes
+resume = /zdata/icurtis/tmp/pytorchnet/results/2018-04-02_17-36-32/Save/model_epoch_4.pth
 
 # dataset options
 dataroot = ./data
 # dataset_options = {"prefetch": "Yes"}
 
-dataset_train = CIFAR10
-input_filename_train = ./train_input
-label_filename_train = ./train_label
+dataset_train = UISDSC
+input_filename_train = ./data/train_input
+label_filename_train = ./data/train_label
 
-dataset_test = CIFAR10
-input_filename_test = ./test_input
-label_filename_test = ./test_label
+dataset_test = UISDSC
+input_filename_test = ./data/test_input
+label_filename_test = ./data/test_label
 
 # train_dev_percent = 0.10
 # test_dev_percent = 0.10
 
-batch_size = 64
+batch_size = 128
 
 # model options
-model_type = resnet18
-model_options = {"nchannels": 3, "nfilters": 64, "nclasses": 10}
+model_type = Uids
+# model_options = {"nchannels": 3, "nfilters": 64, "nclasses": 10}
 loss_type = Classification
 loss_options = {}
 evaluation_type = Top1Classification
@@ -39,11 +40,11 @@ nepochs = 200
 
 learning_rate = 1e-1
 
-# optim_method = SGD
-# optim_options = {"momentum": 0.9, "weight_decay": 0.0}
+optim_method = SGD
+optim_options = {"momentum": 0.5, "weight_decay": 0.0}
 
-optim_method = Adam
-optim_options = {"betas": "(0.9, 0.999)"}
+# optim_method = Adam
+# optim_options = {"betas": "(0.9, 0.999)"}
 
 scheduler_method = CosineAnnealingLR
 scheduler_options = {"T_max": 25, "eta_min": 1e-6}

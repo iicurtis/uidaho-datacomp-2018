@@ -107,6 +107,7 @@ class Tester:
             bar = plugins.Bar('{:<10}'.format('Test'), max=len(dataloader))
         end = time.time()
 
+        correct = 0
         for i, (inputs, labels) in enumerate(dataloader):
             # keeps track of data loading time
             data_time = time.time() - end
@@ -124,6 +125,8 @@ class Tester:
             loss = self.criterion(output, self.labels)
 
             acc = self.evaluation(output, self.labels)
+            pred = output.data.max(1, keepdim=True)[1]
+            correct += pred.eq(self.labels.data.view_as(pred)).long().cpu().sum()
 
             self.losses['Accuracy'] = acc
             self.losses['Loss'] = loss.data[0]
@@ -148,6 +151,9 @@ class Tester:
 
         if self.log_type == 'progressbar':
             bar.finish()
+        print('\nTest set: Average Accuracy: {}/{} ({:.0f}%)\n'.format(
+            correct, len(dataloader.dataset),
+            100. * correct / len(dataloader.dataset)))
 
         loss = self.monitor.getvalues()
         self.log_loss.update(loss)
