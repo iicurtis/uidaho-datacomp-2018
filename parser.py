@@ -40,7 +40,6 @@ kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 test_loader = torch.utils.data.DataLoader(
     TestLoader('data/raw/sub_test.csv', transform=transforms.Compose([
         # transforms.Resize(28),
-        transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,)),
     ])),
     batch_size=args.test_batch_size, shuffle=False, **kwargs)
@@ -50,7 +49,7 @@ model = models.Uids()
 if args.cuda:
     model = torch.nn.DataParallel(model, device_ids=list(range(1)))
     model = model.cuda()
-savedir = Path("results/2018-04-03_07-43-23")
+savedir = Path("results/2018-04-04_16-21-25")
 save = sorted(list(savedir.glob("**/*.pth")))[-1]
 print("Loading file: {}".format(save))
 state_dict = torch.load(save)
@@ -64,7 +63,7 @@ def test():
     print("Running")
     model.eval()
     lsize = len(test_loader) * args.test_batch_size
-    results = np.ones((lsize, 6), dtype=np.int64)
+    results = np.ones((lsize, 6), dtype=np.float64)
     for data_list, index in test_loader:
         for k, data in enumerate(data_list):
             if args.cuda:
@@ -99,9 +98,6 @@ def test():
         if (np.count_nonzero(k == 10) + np.count_nonzero(k == 11)) != 1:
             k[5] = 2
     df = pd.DataFrame(results)
-    df = df.replace(12, "=")
-    df = df.replace(11, "-")
-    df = df.replace(10, "+")
     df.to_csv("curtis_debug.csv")
     sub = pd.DataFrame({"label": df[5]})
     sub.to_csv("curtis_submission.csv", index_label="index")

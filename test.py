@@ -51,7 +51,7 @@ class Tester:
         self.log_loss.register(self.params_loss)
 
         # monitor testing
-        self.monitor = plugins.Monitor()
+        self.monitor = plugins.Monitor(smoothing=True)
         self.params_monitor = {
             'Loss': {'dtype': 'running_mean'},
             'Accuracy': {'dtype': 'running_mean'}
@@ -151,7 +151,8 @@ class Tester:
 
         if self.log_type == 'progressbar':
             bar.finish()
-        print('\nTest set: Average Accuracy: {}/{} ({:.0f}%)\n'.format(
+        print('\nTest set: Average Loss: {} Average Accuracy: {}/{} ({:.0f}%)\n'.format(
+            self.monitor.getvalues('Loss'),
             correct, len(dataloader.dataset),
             100. * correct / len(dataloader.dataset)))
 

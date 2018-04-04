@@ -5,19 +5,19 @@ env = main
 same_env = Yes
 log_type = progressbar
 save_results = Yes
-resume = /zdata/icurtis/tmp/pytorchnet/results/2018-04-02_17-36-32/Save/model_epoch_4.pth
+resume = /zdata/icurtis/tmp/pytorchnet/results/2018-04-04_16-06-20/Save/model_epoch_0.pth
 
 # dataset options
 dataroot = ./data
 # dataset_options = {"prefetch": "Yes"}
 
 dataset_train = UISDSC
-input_filename_train = ./data/train_input
-label_filename_train = ./data/train_label
+#input_filename_train = ./data/train_input
+#label_filename_train = ./data/train_label
 
 dataset_test = UISDSC
-input_filename_test = ./data/test_input
-label_filename_test = ./data/test_label
+#input_filename_test = ./data/test_input
+#label_filename_test = ./data/test_label
 
 # train_dev_percent = 0.10
 # test_dev_percent = 0.10
@@ -36,7 +36,7 @@ resolution_high = 32
 resolution_wide = 32
 
 manual_seed = 0
-nepochs = 200
+nepochs = 2000
 
 learning_rate = 1e-1
 

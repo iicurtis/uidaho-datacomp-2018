@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from PIL import Image
+import torch
 from torch.utils.data import Dataset
 import skimage
 
@@ -67,14 +68,16 @@ class TestLoader(Dataset):
         return len(self.train_data)
 
     def __getitem__(self, idx):
-        img = self.train_data.iloc[idx, 1:].as_matrix().reshape(24, 120)
-        img = img.astype(np.uint8)
-        img = add_noise(img) * 255
-        img = Image.fromarray(img, mode='L')
-        img.save("data/img/prob_{:08d}.png".format(idx))
+        img = self.train_data.iloc[idx, 1:].as_matrix().reshape(1, 24, 120)
+        # img = img.astype(np.uint8)
+        img = add_noise(img)
 
         images = []
-        for k, imgchar in enumerate(crop(img, 24, 24)):
+        for k in range(5):
+            bgn = k*24
+            end = (k+1)*24
+            imgchar = img[:, :, bgn:end]
+            imgchar = torch.from_numpy(imgchar).float()
             if self.transform is not None:
                 imgchar = self.transform(imgchar)
             images.append(imgchar)
