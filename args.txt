@@ -5,7 +5,7 @@ env = main
 same_env = Yes
 log_type = progressbar
 save_results = Yes
-resume = /zdata/icurtis/tmp/pytorchnet/results/2018-04-04_16-06-20/Save/model_epoch_0.pth
+# resume = /zdata/icurtis/tmp/pytorchnet/results/2018-04-04_16-58-44/Save/model_epoch_166.pth
 
 # dataset options
 dataroot = ./data
@@ -25,15 +25,15 @@ dataset_test = UISDSC
 batch_size = 128
 
 # model options
-model_type = Uids
-# model_options = {"nchannels": 3, "nfilters": 64, "nclasses": 10}
+model_type = Vgg
+model_options = {"nchannels": 1, "nfilters": 8, "nclasses": 13}
 loss_type = Classification
 loss_options = {}
 evaluation_type = Top1Classification
 evaluation_options = {}
 
-resolution_high = 32
-resolution_wide = 32
+resolution_high = 24
+resolution_wide = 24
 
 manual_seed = 0
 nepochs = 2000
@@ -41,15 +41,15 @@ nepochs = 2000
 learning_rate = 1e-1
 
 optim_method = SGD
-optim_options = {"momentum": 0.5, "weight_decay": 0.0}
+optim_options = {"momentum": 0.9, "weight_decay": 0.0}
 
 # optim_method = Adam
 # optim_options = {"betas": "(0.9, 0.999)"}
 
 scheduler_method = CosineAnnealingLR
-scheduler_options = {"T_max": 25, "eta_min": 1e-6}
+scheduler_options = {"T_max": 40, "eta_min": 1e-8}
 
 # cpu/gpu settings
 cuda = True
 ngpu = 1
-nthreads = 20
+nthreads = 8

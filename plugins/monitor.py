@@ -38,9 +38,12 @@ class Monitor:
                                                  modules[key] * batch_size
                                                  ) / (self.num + batch_size)
                 else:
-                    self.values[key]['value'] = self.values[key][
-                        'value'] * self.smoothness + \
-                        modules[key] * (1 - self.smoothness)
+                    if self.num == 0:
+                        self.values[key]['value'] = modules[key]
+                    else:
+                        self.values[key]['value'] = self.values[key][
+                            'value'] * self.smoothness + \
+                            modules[key] * (1 - self.smoothness)
             else:
                 raise Exception('Data type not supported, please update the '
                                 'monitor plugin and rerun !!')

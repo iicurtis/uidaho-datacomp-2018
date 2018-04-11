@@ -180,21 +180,9 @@ def transform_images(labelpath, imagepath):
     labels = labels[:, 1]
     images = images[:, 1:].reshape(images.shape[0], 24, 24)
     train_images, test_images, train_labels, test_labels = train_test_split(images, labels, test_size=0.2)
-    train_image_list = []
-    train_label_list = []
-    start = timer()
-    for i, (im, l) in enumerate(zip(train_images, train_labels)):
-        for k in range(20):
-            train_image_list.append(add_noise(shift_pixels(rotation(im))))
-            train_label_list.append(l)
-        if i % 1000 == 0:
-            print("{:08d}: {:.6f}".format(i, timer() - start))
-            start = timer()
-    for i, im in enumerate(test_images):
-        test_images[i] = add_noise(im)
-    train_image_list = np.asarray(train_image_list).reshape(len(train_image_list), 1, 24, 24)
-    train_label_list = np.asarray(train_label_list)
+    train_images = np.asarray(train_images).reshape(len(train_images), 1, 24, 24)
+    train_labels = np.asarray(train_labels)
     test_labels = np.asarray(test_labels)
     test_images = np.asarray(test_images).reshape(len(test_images), 1, 24, 24)
 
-    return train_label_list, test_labels, torch.from_numpy(train_image_list), torch.from_numpy(test_images)
+    return train_labels, test_labels, torch.from_numpy(train_images), torch.from_numpy(test_images)

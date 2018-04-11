@@ -120,6 +120,7 @@ class Trainer:
             bar = plugins.Bar('{:<5}'.format('Train'), max=len(dataloader))
         end = time.time()
 
+        correct = 0
         for i, (inputs, labels) in enumerate(dataloader):
             # keeps track of data loading time
             data_time = time.time() - end
@@ -140,6 +141,8 @@ class Trainer:
             self.optimizer.step()
 
             acc = self.evaluation(outputs, self.labels)
+            pred = outputs.data.max(1, keepdim=True)[1]
+            correct += pred.eq(self.labels.data.view_as(pred)).long().cpu().sum()
 
             self.losses['Accuracy'] = acc
             self.losses['Loss'] = loss.data[0]
@@ -166,6 +169,10 @@ class Trainer:
 
         if self.log_type == 'progressbar':
             bar.finish()
+        print('\nTrain set: Average Loss: {} Average Accuracy: {}/{} ({:.0f}%)\n'.format(
+            self.monitor.getvalues('Loss'),
+            correct, len(dataloader.dataset),
+            100. * correct / len(dataloader.dataset)))
 
         loss = self.monitor.getvalues()
         self.log_loss.update(loss)

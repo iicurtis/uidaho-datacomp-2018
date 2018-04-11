@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 import torch
 from torch.autograd import Variable
+from torch.utils.data import Dataset
 from torchvision import transforms
-from loader import TestLoader
 from pathlib import Path
 
 import models
@@ -30,6 +30,43 @@ parser.add_argument('--load', type=str, default=None,
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
+
+class TestLoader(Dataset):
+    """UIdaho CSV dataset."""
+
+    def __init__(self, test_file, transform=None):
+        """
+        Args:
+            csv_file (string): Path to the csv file with annotations.
+            root_dir (string): Directory with all the images.
+            transform (callable, optional): Optional transform to be applied
+                on a sample.
+        """
+        self.train_data = pd.read_csv(test_file).values
+        self.train_data = self.train_data[:, 1:].reshape(self.train_data.shape[0], 1, 24, 120)
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.train_data)
+
+    def __getitem__(self, idx):
+        img = self.train_data[idx]
+        # img = img.astype(np.uint8)
+        # img = add_noise(img)
+
+        images = []
+        for k in range(5):
+            bgn = k*24
+            end = (k+1)*24
+            imgchar = img[:, :, bgn:end]
+            imgchar = torch.from_numpy(imgchar).float()
+            if self.transform is not None:
+                imgchar = self.transform(imgchar)
+            images.append(imgchar)
+
+        return images, idx
+
+
 torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
@@ -45,11 +82,12 @@ test_loader = torch.utils.data.DataLoader(
     batch_size=args.test_batch_size, shuffle=False, **kwargs)
 
 
-model = models.Uids()
+model = models.Vgg(nchannels=1, nfilters=8, nclasses=13)
 if args.cuda:
     model = torch.nn.DataParallel(model, device_ids=list(range(1)))
     model = model.cuda()
-savedir = Path("results/2018-04-04_16-21-25")
+# savedir = Path("./results/2018-04-11_10-50-51")
+savedir = sorted(list(Path("./results/").iterdir()))[-1]
 save = sorted(list(savedir.glob("**/*.pth")))[-1]
 print("Loading file: {}".format(save))
 state_dict = torch.load(save)
@@ -63,7 +101,7 @@ def test():
     print("Running")
     model.eval()
     lsize = len(test_loader) * args.test_batch_size
-    results = np.ones((lsize, 6), dtype=np.float64)
+    results = np.zeros((lsize, 6), dtype=np.float64)
     for data_list, index in test_loader:
         for k, data in enumerate(data_list):
             if args.cuda:
@@ -81,22 +119,24 @@ def test():
         if k[1] == 12:
             if k[3] == 10:
                 if k[0] == k[2] + k[4]:
-                    k[5] = 0
+                    k[5] = 1
             elif k[3] == 11:
                 if k[0] == k[2] - k[4]:
-                    k[5] = 0
+                    k[5] = 1
         elif k[3] == 12:
             if k[1] == 10:
                 if k[4] == k[0] + k[2]:
-                    k[5] = 0
+                    k[5] = 1
             elif k[1] == 11:
                 if k[4] == k[0] - k[2]:
-                    k[5] = 0
+                    k[5] = 1
         #unique, counts = np.unique(k, return_counts=True)
         if np.count_nonzero(k == 12) != 1:
             k[5] = 3
+            print("WARN: {} has more than one equals!!".format(k[0]))
         if (np.count_nonzero(k == 10) + np.count_nonzero(k == 11)) != 1:
             k[5] = 2
+            print("WARN: {} has more than one operator!!".format(k[0]))
     df = pd.DataFrame(results)
     df.to_csv("curtis_debug.csv")
     sub = pd.DataFrame({"label": df[5]})

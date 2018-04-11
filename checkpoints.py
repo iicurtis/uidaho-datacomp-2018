@@ -20,7 +20,7 @@ class Checkpoints:
     def save(self, epoch, model, best):
         if best is True:
             torch.save(model.state_dict(),
-                       '%s/model_epoch_%d.pth' % (self.dir_save, epoch))
+                       '{}/model_epoch_{:04d}.pth'.format(self.dir_save, epoch))
 
     def load(self, model, filename):
         if os.path.isfile(filename):

@@ -108,6 +108,7 @@ class Tester:
         end = time.time()
 
         correct = 0
+        test_loss = 0
         for i, (inputs, labels) in enumerate(dataloader):
             # keeps track of data loading time
             data_time = time.time() - end
@@ -123,6 +124,7 @@ class Tester:
             self.model.zero_grad()
             output = self.model(self.inputs)
             loss = self.criterion(output, self.labels)
+            test_loss += loss.data[0]
 
             acc = self.evaluation(output, self.labels)
             pred = output.data.max(1, keepdim=True)[1]
@@ -151,8 +153,9 @@ class Tester:
 
         if self.log_type == 'progressbar':
             bar.finish()
+        test_loss /= len(dataloader.dataset)
         print('\nTest set: Average Loss: {} Average Accuracy: {}/{} ({:.0f}%)\n'.format(
-            self.monitor.getvalues('Loss'),
+            test_loss,
             correct, len(dataloader.dataset),
             100. * correct / len(dataloader.dataset)))
 
@@ -161,4 +164,4 @@ class Tester:
         loss['Test_Image'] = inputs[0]
         loss['Test_Images'] = inputs
         self.visualizer.update(loss)
-        return self.monitor.getvalues('Loss')
+        return test_loss
