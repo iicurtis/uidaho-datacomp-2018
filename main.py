@@ -55,6 +55,9 @@ def main():
             loss_best = loss_test
             if args.save_results:
                 checkpoints.save(epoch, model, model_best)
+        # elif epoch % 10 == 0:
+        #     if args.save_results:
+        #         checkpoints.save(epoch, model, model_best)
 
 
 if __name__ == "__main__":

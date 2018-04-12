@@ -75,10 +75,12 @@ if args.cuda:
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
 test_loader = torch.utils.data.DataLoader(
-    TestLoader('data/raw/sub_test.csv', transform=transforms.Compose([
-        # transforms.Resize(28),
-        transforms.Normalize((0.1307,), (0.3081,)),
-    ])),
+    TestLoader('data/raw/sub_test.csv',
+        #        transform=transforms.Compose([
+        #            # transforms.Resize(28),
+        # transforms.Normalize((0.1307,), (0.3081,)),
+        #        ])),
+               ),
     batch_size=args.test_batch_size, shuffle=False, **kwargs)
 
 

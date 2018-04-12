@@ -15,6 +15,26 @@ from pathlib import Path
 import cv2
 
 
+def rotation(img, rotation_angle=15):
+    rows, cols = img.shape
+    angle = np.random.randint(-rotation_angle, rotation_angle)
+    M = cv2.getRotationMatrix2D((cols/2, rows/2), angle, 1)
+    img = cv2.warpAffine(img, M, (cols, rows))
+    return img
+
+
+def shift_pixels(img, shift_range=1):
+    rows, cols = img.shape
+    shift = np.random.randint(-shift_range, shift_range)
+    M = np.float32([[1, 0, shift], [0, 1, shift]])
+    return cv2.warpAffine(img, M, (cols, rows))
+
+
+def add_noise(img, gauss_var=0.02):
+    img = skimage.util.random_noise(img, mode='gaussian', var=gauss_var)
+    return img
+
+
 class UISDSC(data.Dataset):
     """`UISDSC <https://dscomp.ibest.uidaho.edu/data>`_ Dataset.
     Args:
@@ -76,6 +96,7 @@ class UISDSC(data.Dataset):
 
         if self.target_transform is not None:
             target = self.target_transform(target)
+        # img = img.sub(img.mean(1)).div(img.std())
 
         return img, target
 
@@ -151,26 +172,6 @@ class UISDSC(data.Dataset):
         tmp = '    Target Transforms (if any): '
         fmt_str += '{0}{1}'.format(tmp, self.target_transform.__repr__().replace('\n', '\n' + ' ' * len(tmp)))
         return fmt_str
-
-
-def rotation(img, rotation_angle=15):
-    rows, cols = img.shape
-    angle = np.random.randint(-rotation_angle, rotation_angle)
-    M = cv2.getRotationMatrix2D((cols/2, rows/2), angle, 1)
-    img = cv2.warpAffine(img, M, (cols, rows))
-    return img
-
-
-def shift_pixels(img, shift_range=1):
-    rows, cols = img.shape
-    shift = np.random.randint(-shift_range, shift_range)
-    M = np.float32([[1, 0, shift], [0, 1, shift]])
-    return cv2.warpAffine(img, M, (cols, rows))
-
-
-def add_noise(img, gauss_var=0.02):
-    img = skimage.util.random_noise(img, mode='gaussian', var=gauss_var)
-    return img
 
 
 def transform_images(labelpath, imagepath):

@@ -86,9 +86,9 @@ class Dataloader:
         elif self.dataset_train_name == 'UISDSC':
             self.dataset_train = getattr(datasets, self.dataset_train_name)(
                 root=self.args.dataroot, train=True, download=True,
-                transform=transforms.Compose([
-                    transforms.Normalize((0.1307,), (0.3081,))
-                ])
+                # transform=transforms.Compose([
+                #     transforms.Normalize((0.1307,), (0.3081,))
+                # ])
             )
 
         elif self.dataset_train_name == 'ImageNet':
@@ -221,9 +221,9 @@ class Dataloader:
         elif self.dataset_test_name == 'UISDSC':
             self.dataset_test = getattr(datasets, self.dataset_test_name)(
                 root=self.args.dataroot, train=False, download=True,
-                transform=transforms.Compose([
-                    transforms.Normalize((0.1307,), (0.3081,))
-                ])
+                # transform=transforms.Compose([
+                #     transforms.Normalize((0.1307,), (0.3081,))
+                # ])
             )
 
         elif self.dataset_test_name == 'ImageNet':

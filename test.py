@@ -109,6 +109,10 @@ class Tester:
 
         correct = 0
         test_loss = 0
+        incorrect = []
+        inc_pred = []
+        actual_ans = []
+        inc_inputs = []
         for i, (inputs, labels) in enumerate(dataloader):
             # keeps track of data loading time
             data_time = time.time() - end
@@ -129,6 +133,12 @@ class Tester:
             acc = self.evaluation(output, self.labels)
             pred = output.data.max(1, keepdim=True)[1]
             correct += pred.eq(self.labels.data.view_as(pred)).long().cpu().sum()
+            inc = pred.ne(self.labels.data.view_as(pred)).squeeze().nonzero().squeeze().long()
+            if inc.numel() > 0:
+                inc_inputs.append(inputs[inc.tolist()])
+                inc_pred.extend(pred[inc].cpu().squeeze().tolist())
+                actual_ans.extend(self.labels.data[inc].cpu().squeeze().tolist())
+                incorrect.extend(inc.cpu().add_(i*len(dataloader)).squeeze().tolist())
 
             self.losses['Accuracy'] = acc
             self.losses['Loss'] = loss.data[0]
@@ -153,15 +163,19 @@ class Tester:
 
         if self.log_type == 'progressbar':
             bar.finish()
+        print(incorrect)
+        print(actual_ans)
+        print(inc_pred)
         test_loss /= len(dataloader.dataset)
-        print('\nTest set: Average Loss: {} Average Accuracy: {}/{} ({:.0f}%)\n'.format(
+        print('\nTest set: Average Loss: {} Average Accuracy: {}/{} ({:8.6f}%)\n'.format(
             test_loss,
             correct, len(dataloader.dataset),
             100. * correct / len(dataloader.dataset)))
 
         loss = self.monitor.getvalues()
         self.log_loss.update(loss)
+        missed_inputs = torch.cat(inc_inputs, 0)
         loss['Test_Image'] = inputs[0]
-        loss['Test_Images'] = inputs
+        loss['Test_Images'] = missed_inputs
         self.visualizer.update(loss)
         return test_loss

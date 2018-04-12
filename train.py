@@ -169,7 +169,7 @@ class Trainer:
 
         if self.log_type == 'progressbar':
             bar.finish()
-        print('\nTrain set: Average Loss: {} Average Accuracy: {}/{} ({:.0f}%)\n'.format(
+        print('\nTrain set: Average Loss: {} Average Accuracy: {}/{} ({:8.6f}%)\n'.format(
             self.monitor.getvalues('Loss'),
             correct, len(dataloader.dataset),
             100. * correct / len(dataloader.dataset)))
