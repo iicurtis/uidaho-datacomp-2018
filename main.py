@@ -42,17 +42,23 @@ def main():
     tester = Tester(args, model, criterion, evaluation)
 
     # start training !!!
-    loss_best = 1e10
+    loss_best = 1.0e4
+    acc_best = 0.0
     for epoch in range(args.nepochs):
         print('\nEpoch %d/%d\n' % (epoch + 1, args.nepochs))
 
         # train for a single epoch
         loss_train = trainer.train(epoch, loaders)
-        loss_test = tester.test(epoch, loaders)
+        loss_test, acc_test = tester.test(epoch, loaders)
 
         if loss_best > loss_test:
             model_best = True
             loss_best = loss_test
+            if args.save_results:
+                checkpoints.save(epoch, model, model_best)
+        elif acc_best < acc_test:
+            model_best = True
+            acc_best = acc_test
             if args.save_results:
                 checkpoints.save(epoch, model, model_best)
         # elif epoch % 10 == 0:

@@ -88,8 +88,10 @@ class UISDSC(data.Dataset):
         """
         if self.train:
             img, target = self.train_data[index], self.train_labels[index]
+            img = torch.from_numpy(shift_pixels(rotation(img.squeeze().numpy()))).unsqueeze(0)
         else:
             img, target = self.test_data[index], self.test_labels[index]
+            #  img = torch.from_numpy(add_noise(img.squeeze().numpy())).unsqueeze(0)
 
         if self.transform is not None:
             img = self.transform(img)

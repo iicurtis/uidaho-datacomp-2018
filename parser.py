@@ -6,6 +6,7 @@ from torch.autograd import Variable
 from torch.utils.data import Dataset
 from torchvision import transforms
 from pathlib import Path
+import skimage
 
 import models
 
@@ -31,6 +32,11 @@ args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
 
+def add_noise(img, gauss_var=0.02):
+    img = skimage.util.random_noise(img, mode='gaussian', var=gauss_var)
+    return img
+
+
 class TestLoader(Dataset):
     """UIdaho CSV dataset."""
 
@@ -52,7 +58,7 @@ class TestLoader(Dataset):
     def __getitem__(self, idx):
         img = self.train_data[idx]
         # img = img.astype(np.uint8)
-        # img = add_noise(img)
+        #  img = add_noise(img)
 
         images = []
         for k in range(5):
@@ -103,7 +109,8 @@ def test():
     print("Running")
     model.eval()
     lsize = len(test_loader) * args.test_batch_size
-    results = np.zeros((lsize, 6), dtype=np.float64)
+    results = np.zeros((lsize, 6), dtype=np.int64)
+    badres = np.zeros((lsize, 5), dtype=np.float64)
     for data_list, index in test_loader:
         for k, data in enumerate(data_list):
             if args.cuda:
@@ -111,9 +118,13 @@ def test():
             data = Variable(data, volatile=True)
             output = model(data)
             if k in [0, 2, 4]:
-                pred = output[:, :10].data.max(1, keepdim=True)[1] # get the index of the max log-probability
+                pred = output[:, :10].data
+                predtop = pred.topk(2, dim=1)  # get the index of the max log-probability
+                diff = predtop[0][:, 0] - predtop[0][:, 1]
+                pred = pred.max(1, keepdim=True)[1]
             else:
                 pred = output[:, 10:].data.max(1, keepdim=True)[1] + 10
+            badres[index, k] = np.squeeze(diff.cpu().numpy())
             results[index, k] = np.squeeze(pred.cpu().numpy())
 
     print("Evaluating")
@@ -132,7 +143,7 @@ def test():
             elif k[1] == 11:
                 if k[4] == k[0] - k[2]:
                     k[5] = 1
-        #unique, counts = np.unique(k, return_counts=True)
+        # unique, counts = np.unique(k, return_counts=True)
         if np.count_nonzero(k == 12) != 1:
             k[5] = 3
             print("WARN: {} has more than one equals!!".format(k[0]))
@@ -144,6 +155,11 @@ def test():
     sub = pd.DataFrame({"label": df[5]})
     sub.to_csv("curtis_submission.csv", index_label="index")
     print("Done HAHAHAHAHAHAHA")
+    questionable = np.argwhere(badres < 4)
+    for q in questionable:
+        r = results[q[0]]
+        print("{:06d}:{}  {} {} {} {} {} | {}  {}".format(q[0], q[1], r[0], r[1],
+                                                      r[2], r[3], r[4], r[5], badres[q[0], q[1]]))
 
 
 test()

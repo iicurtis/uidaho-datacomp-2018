@@ -164,8 +164,8 @@ class Tester:
         if self.log_type == 'progressbar':
             bar.finish()
         print(incorrect)
-        print(actual_ans)
-        print(inc_pred)
+        print("Correct ", actual_ans)
+        print("Predict ", inc_pred)
         test_loss /= len(dataloader.dataset)
         print('\nTest set: Average Loss: {} Average Accuracy: {}/{} ({:8.6f}%)\n'.format(
             test_loss,
@@ -178,4 +178,4 @@ class Tester:
         loss['Test_Image'] = inputs[0]
         loss['Test_Images'] = missed_inputs
         self.visualizer.update(loss)
-        return test_loss
+        return test_loss, correct
