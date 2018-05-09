@@ -3,7 +3,7 @@
 
 ![Data example][logo]
 
-[logo]: https://github.com/iicurtis/uidaho-datacomp-2018/raw/master/img/prob_00000057.png
+[logo]: https://github.com/iicurtis/uidaho-datacomp-2018/raw/master/img/example.png
 
 
 The [machine learning competition](https://dscomp.ibest.uidaho.edu/) will ask participants to grade 20,000 handwritten math quizzes. Can you develop a model that performs better than a random guess? Will you climb to the top of our Leaderboard?
